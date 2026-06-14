@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Playlist Up Next</title>
+</head>
+<body>
+    <div id="PlaylistUpNextConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="PlaylistUpNextConfigForm">
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="DefaultLimit">Default item limit</label>
+                        <input id="DefaultLimit" name="DefaultLimit" type="number" is="emby-input" min="1" max="100" />
+                        <div class="fieldDescription">Maximum playlist candidates returned when the client does not specify a limit.</div>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="IncludeUnstartedPlaylists" name="IncludeUnstartedPlaylists" type="checkbox" is="emby-checkbox" />
+                            <span>Include unstarted playlists</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">Return the first playable item from playlists where this user has no progress.</div>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="WrapAtEnd" name="WrapAtEnd" type="checkbox" is="emby-checkbox" />
+                            <span>Wrap finished playlists</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">Return the first item again when every later playlist item has been played.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="ExcludedPlaylistNames">Excluded playlist names</label>
+                        <input id="ExcludedPlaylistNames" name="ExcludedPlaylistNames" type="text" is="emby-input" />
+                        <div class="fieldDescription">Comma-separated playlist names to ignore.</div>
+                    </div>
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var PlaylistUpNextConfig = {
+                pluginUniqueId: '399d385c-b73d-4188-b911-cfe6bdd9e82b'
+            };
+
+            document.querySelector('#PlaylistUpNextConfigPage')
+                .addEventListener('pageshow', function() {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(PlaylistUpNextConfig.pluginUniqueId).then(function (config) {
+                        document.querySelector('#DefaultLimit').value = config.DefaultLimit || 20;
+                        document.querySelector('#IncludeUnstartedPlaylists').checked = !!config.IncludeUnstartedPlaylists;
+                        document.querySelector('#WrapAtEnd').checked = !!config.WrapAtEnd;
+                        document.querySelector('#ExcludedPlaylistNames').value = (config.ExcludedPlaylistNames || []).join(', ');
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+            document.querySelector('#PlaylistUpNextConfigForm')
+                .addEventListener('submit', function(e) {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(PlaylistUpNextConfig.pluginUniqueId).then(function (config) {
+                        config.DefaultLimit = parseInt(document.querySelector('#DefaultLimit').value || '20', 10);
+                        config.IncludeUnstartedPlaylists = document.querySelector('#IncludeUnstartedPlaylists').checked;
+                        config.WrapAtEnd = document.querySelector('#WrapAtEnd').checked;
+                        config.ExcludedPlaylistNames = document.querySelector('#ExcludedPlaylistNames').value
+                            .split(',')
+                            .map(function (value) { return value.trim(); })
+                            .filter(function (value) { return value.length > 0; });
+
+                        ApiClient.updatePluginConfiguration(PlaylistUpNextConfig.pluginUniqueId, config).then(function (result) {
+                            Dashboard.processPluginConfigurationUpdateResult(result);
+                        });
+                    });
+
+                    e.preventDefault();
+                    return false;
+                });
+        </script>
+    </div>
+</body>
+</html>

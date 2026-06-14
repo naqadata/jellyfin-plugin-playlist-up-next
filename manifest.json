@@ -1,0 +1,20 @@
+[
+  {
+    "guid": "399d385c-b73d-4188-b911-cfe6bdd9e82b",
+    "name": "Playlist Up Next",
+    "description": "Adds a server API for playlist-ordered up-next/resume candidates.",
+    "overview": "Returns one next candidate per playlist, using the user's item progress and the playlist order.",
+    "owner": "naqadata",
+    "category": "General",
+    "versions": [
+      {
+        "version": "0.1.0.0",
+        "changelog": "Initial server API and configuration page.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://raw.githubusercontent.com/naqadata/jellyfin-plugin-playlist-up-next/main/dist/Jellyfin.Plugin.PlaylistUpNext_0.1.0.zip",
+        "checksum": "a4c98a84ca2202e1f26292392c0fa0b0",
+        "timestamp": "2026-06-14T00:00:00Z"
+      }
+    ]
+  }
+]
