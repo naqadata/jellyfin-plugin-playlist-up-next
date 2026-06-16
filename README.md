@@ -4,6 +4,12 @@ Playlist Up Next is a Jellyfin server plugin that exposes playlist-ordered resum
 
 It does not modify Jellyfin clients by itself. Stock Jellyfin Roku cannot render a new home-screen row from a server plugin alone; the Roku app has a fixed set of home rows. This plugin provides the server API a Roku fork, an upstream Roku PR, or a web-client customization can consume.
 
+## Related Projects
+
+- [Naqafin for Roku](https://github.com/naqadata/naqafin-roku): Roku client that consumes this plugin's `Playlist Up Next` endpoint.
+- [Jellyfin Plugin Auto Generate Captions](https://github.com/naqadata/jellyfin-plugin-auto-generate-captions): separate companion plugin used by Naqafin for on-demand generated subtitle sessions.
+- [Naqafin Caption Worker](https://github.com/naqadata/naqafin-caption-worker): optional CUDA worker for the auto-generated captions plugin.
+
 ## Client Support
 
 This plugin is designed to work with [Naqafin for Roku](https://github.com/naqadata/naqafin-roku), an unofficial Roku client forked from the official Jellyfin Roku client.
