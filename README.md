@@ -4,6 +4,12 @@ Playlist Up Next is a Jellyfin server plugin that exposes playlist-ordered resum
 
 It does not modify Jellyfin clients by itself. Stock Jellyfin Roku cannot render a new home-screen row from a server plugin alone; the Roku app has a fixed set of home rows. This plugin provides the server API a Roku fork, an upstream Roku PR, or a web-client customization can consume.
 
+## Client Support
+
+This plugin is designed to work with [Naqafin for Roku](https://github.com/naqadata/naqafin-roku), an unofficial Roku client forked from the official Jellyfin Roku client.
+
+Stock Jellyfin Roku cannot display the `Playlist Up Next` row by installing only this server plugin. Until equivalent support is accepted upstream or implemented by another client, Naqafin is the intended Roku client for this plugin.
+
 ## Behavior
 
 For each playlist visible to the user, the plugin scans items in playlist order and picks one candidate:
@@ -70,16 +76,21 @@ Then install the plugin from Jellyfin's plugin catalog and restart the server.
 
 ## Packaging
 
-Regenerate the committed package and manifest checksum after release-affecting changes:
+Create a new release package with an explicit version and changelog:
 
 ```bash
-./scripts/package.sh
+./scripts/package.sh 0.1.1 "Describe the release"
 ```
+
+The script writes `dist/Jellyfin.Plugin.PlaylistUpNext_<version>.zip` and adds a matching `manifest.json` version entry with checksum and timestamp.
+
+Release artifacts are treated as immutable once pushed. The script refuses to overwrite an existing zip or manifest version unless `--force` is passed, and it rejects versions lower than the latest manifest version.
 
 ## Roku
 
 The official Roku app cannot be extended by a Jellyfin server plugin to show a new `Playlist Up Next` home row. To make this appear on Roku, one of these has to happen:
 
+- Use [Naqafin for Roku](https://github.com/naqadata/naqafin-roku), which includes client support for this endpoint.
 - Patch/fork `jellyfin-roku` to call `/PlaylistUpNext/{userId}` and add a home row.
 - Get that support accepted upstream in the official Roku client.
 - Use a web-client-only plugin/theme approach, which helps browser/iOS/Android web-shell clients but not native Roku.
