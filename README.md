@@ -16,6 +16,8 @@ This plugin is designed to work with [Naqafin for Roku](https://github.com/naqad
 
 Stock Jellyfin Roku cannot display the `Playlist Up Next` row by installing only this server plugin. Until equivalent support is accepted upstream or implemented by another client, Naqafin is the intended Roku client for this plugin.
 
+This plugin is independent from the generated-caption stack. It can be installed alongside [Jellyfin Plugin Auto Generate Captions](https://github.com/naqadata/jellyfin-plugin-auto-generate-captions), but neither plugin requires the other.
+
 ## Behavior
 
 For each playlist visible to the user, the plugin scans items in playlist order and picks one candidate:
@@ -97,7 +99,7 @@ Release artifacts are treated as immutable once pushed. The script refuses to ov
 The official Roku app cannot be extended by a Jellyfin server plugin to show a new `Playlist Up Next` home row. To make this appear on Roku, one of these has to happen:
 
 - Use [Naqafin for Roku](https://github.com/naqadata/naqafin-roku), which includes client support for this endpoint.
-- Patch/fork `jellyfin-roku` to call `/PlaylistUpNext/{userId}` and add a home row.
+- Patch or fork the upstream Jellyfin Roku app to call `/PlaylistUpNext/{userId}` and add a home row.
 - Get that support accepted upstream in the official Roku client.
 - Use a web-client-only plugin/theme approach, which helps browser/iOS/Android web-shell clients but not native Roku.
 
