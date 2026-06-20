@@ -33,6 +33,11 @@ public class PlaylistUpNextEntryDto
     public int UnplayedItemCount { get; set; }
 
     /// <summary>
+    /// Gets or sets the home playback state this entry belongs to.
+    /// </summary>
+    public string PlaybackState { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the reason this item was selected.
     /// </summary>
     public string Reason { get; set; } = string.Empty;

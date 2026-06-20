@@ -22,6 +22,9 @@ namespace Jellyfin.Plugin.PlaylistUpNext.Controllers;
 [Authorize]
 public class PlaylistUpNextController : ControllerBase
 {
+    private const string PlaybackStateResume = "resume";
+    private const string PlaybackStateNext = "next";
+
     private readonly IUserManager _userManager;
     private readonly IUserDataManager _userDataManager;
     private readonly IPlaylistManager _playlistManager;
@@ -50,6 +53,7 @@ public class PlaylistUpNextController : ControllerBase
     /// </summary>
     /// <param name="userId">User id.</param>
     /// <param name="limit">Maximum number of items to return.</param>
+    /// <param name="playbackState">Optional playback state filter: resume or next.</param>
     /// <param name="includeUnstarted">Whether playlists with no user progress should return their first item.</param>
     /// <param name="wrapAtEnd">Whether a finished playlist should wrap to its first item.</param>
     /// <returns>A Jellyfin item query result.</returns>
@@ -57,6 +61,7 @@ public class PlaylistUpNextController : ControllerBase
     public ActionResult<QueryResult<BaseItemDto>> GetItems(
         Guid userId,
         [FromQuery] int? limit,
+        [FromQuery] string? playbackState,
         [FromQuery] bool? includeUnstarted,
         [FromQuery] bool? wrapAtEnd)
     {
@@ -66,7 +71,13 @@ public class PlaylistUpNextController : ControllerBase
             return NotFound();
         }
 
-        IReadOnlyList<PlaylistUpNextEntryDto> entries = BuildEntries(user, limit, includeUnstarted, wrapAtEnd);
+        string? normalizedPlaybackState = NormalizePlaybackState(playbackState);
+        if (!string.IsNullOrWhiteSpace(playbackState) && normalizedPlaybackState is null)
+        {
+            return BadRequest("playbackState must be 'resume' or 'next'.");
+        }
+
+        IReadOnlyList<PlaylistUpNextEntryDto> entries = BuildEntries(user, limit, normalizedPlaybackState, includeUnstarted, wrapAtEnd);
         return new QueryResult<BaseItemDto>(entries.Select(i => i.Item).ToArray());
     }
 
@@ -75,6 +86,7 @@ public class PlaylistUpNextController : ControllerBase
     /// </summary>
     /// <param name="userId">User id.</param>
     /// <param name="limit">Maximum number of items to return.</param>
+    /// <param name="playbackState">Optional playback state filter: resume or next.</param>
     /// <param name="includeUnstarted">Whether playlists with no user progress should return their first item.</param>
     /// <param name="wrapAtEnd">Whether a finished playlist should wrap to its first item.</param>
     /// <returns>Playlist-aware up-next entries.</returns>
@@ -82,6 +94,7 @@ public class PlaylistUpNextController : ControllerBase
     public ActionResult<QueryResult<PlaylistUpNextEntryDto>> GetEntries(
         Guid userId,
         [FromQuery] int? limit,
+        [FromQuery] string? playbackState,
         [FromQuery] bool? includeUnstarted,
         [FromQuery] bool? wrapAtEnd)
     {
@@ -91,13 +104,20 @@ public class PlaylistUpNextController : ControllerBase
             return NotFound();
         }
 
-        IReadOnlyList<PlaylistUpNextEntryDto> entries = BuildEntries(user, limit, includeUnstarted, wrapAtEnd);
+        string? normalizedPlaybackState = NormalizePlaybackState(playbackState);
+        if (!string.IsNullOrWhiteSpace(playbackState) && normalizedPlaybackState is null)
+        {
+            return BadRequest("playbackState must be 'resume' or 'next'.");
+        }
+
+        IReadOnlyList<PlaylistUpNextEntryDto> entries = BuildEntries(user, limit, normalizedPlaybackState, includeUnstarted, wrapAtEnd);
         return new QueryResult<PlaylistUpNextEntryDto>(entries);
     }
 
     private IReadOnlyList<PlaylistUpNextEntryDto> BuildEntries(
         User user,
         int? limit,
+        string? playbackState,
         bool? includeUnstarted,
         bool? wrapAtEnd)
     {
@@ -114,6 +134,7 @@ public class PlaylistUpNextController : ControllerBase
             .Select(i => TryCreateEntry(i, user, dtoOptions, resumeItems, offerUnstarted, wrapFinished))
             .Where(i => i is not null)
             .Select(i => i!)
+            .Where(i => playbackState is null || string.Equals(i.PlaybackState, playbackState, StringComparison.OrdinalIgnoreCase))
             .OrderByDescending(i => i.LastPlayedDate ?? DateTime.MinValue)
             .ThenBy(i => i.PlaylistName, StringComparer.OrdinalIgnoreCase)
             .Take(take)
@@ -247,10 +268,31 @@ public class PlaylistUpNextController : ControllerBase
             PlaylistIndex = playlistIndex ?? progress.Index,
             IsExternalResumeItem = isExternalResumeItem,
             UnplayedItemCount = unplayedItemCount,
+            PlaybackState = isExternalResumeItem || reason == "resume-item" ? PlaybackStateResume : PlaybackStateNext,
             Reason = reason,
             LastPlayedDate = lastPlayedDate,
             Item = _dtoService.GetBaseItemDto(progress.Item, dtoOptions, user)
         };
+    }
+
+    private static string? NormalizePlaybackState(string? playbackState)
+    {
+        if (string.IsNullOrWhiteSpace(playbackState))
+        {
+            return null;
+        }
+
+        if (string.Equals(playbackState, PlaybackStateResume, StringComparison.OrdinalIgnoreCase))
+        {
+            return PlaybackStateResume;
+        }
+
+        if (string.Equals(playbackState, PlaybackStateNext, StringComparison.OrdinalIgnoreCase))
+        {
+            return PlaybackStateNext;
+        }
+
+        return null;
     }
 
     private static DtoOptions CreateDtoOptions()

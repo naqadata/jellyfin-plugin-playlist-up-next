@@ -28,7 +28,14 @@ For each playlist visible to the user, the plugin scans items in playlist order 
 - Optionally include the first item from unstarted playlists.
 - Optionally wrap a finished playlist back to the first item.
 
-The plugin returns at most one item per playlist and sorts playlists by most recent progress. The `/Entries` endpoint also returns the selected item's zero-based playlist index, selection reason, unplayed item count, and whether the selected item is an external resume item so clients can play the resume item first and then continue from the playlist queue.
+The plugin returns at most one item per playlist and sorts playlists by most recent progress. The `/Entries` endpoint also returns the selected item's zero-based playlist index, playback state, selection reason, unplayed item count, and whether the selected item is an external resume item so clients can play the resume item first and then continue from the playlist queue.
+
+`PlaybackState` is the client-facing routing field:
+
+- `resume`: the playlist has an in-progress item or a newer matching external resume item.
+- `next`: the playlist has no in-progress item and the selected item is the next thing to watch.
+
+`Reason` gives a more specific diagnostic value such as `resume-item`, `external-resume-item`, or `next-after-played`.
 
 ## API
 
@@ -47,6 +54,7 @@ GET /PlaylistUpNext/{userId}/Entries?limit=20
 Useful query parameters:
 
 - `limit`: maximum results, 1-100.
+- `playbackState`: optional filter; valid values are `resume` and `next`.
 - `includeUnstarted`: `true` to return the first item from playlists with no progress.
 - `wrapAtEnd`: `true` to return the first item when a playlist is complete.
 

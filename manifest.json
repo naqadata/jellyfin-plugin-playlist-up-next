@@ -14,6 +14,14 @@
         "sourceUrl": "https://raw.githubusercontent.com/naqadata/jellyfin-plugin-playlist-up-next/main/dist/Jellyfin.Plugin.PlaylistUpNext_0.1.0.zip",
         "checksum": "a4c98a84ca2202e1f26292392c0fa0b0",
         "timestamp": "2026-06-14T00:00:00Z"
+      },
+      {
+        "version": "0.1.1.0",
+        "changelog": "Add playback state filtering for merged Roku home rows",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://raw.githubusercontent.com/naqadata/jellyfin-plugin-playlist-up-next/main/dist/Jellyfin.Plugin.PlaylistUpNext_0.1.1.zip",
+        "checksum": "cf1ac0a4462d9aa1e19fc43a50cec158",
+        "timestamp": "2026-06-20T02:58:23Z"
       }
     ]
   }

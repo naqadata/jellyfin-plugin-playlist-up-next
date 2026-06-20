@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>Jellyfin.Plugin.PlaylistUpNext</RootNamespace>
     <AssemblyName>Jellyfin.Plugin.PlaylistUpNext</AssemblyName>
+    <Version>0.1.1.0</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
