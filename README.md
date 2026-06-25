@@ -2,7 +2,7 @@
 
 Playlist Up Next is a Jellyfin server plugin that exposes playlist-ordered resume candidates.
 
-It does not modify Jellyfin clients by itself. Stock Jellyfin Roku cannot render a new home-screen row from a server plugin alone; the Roku app has a fixed set of home rows. This plugin provides the server API a Roku fork, an upstream Roku PR, or a web-client customization can consume.
+It does not modify Jellyfin clients by itself. Stock Jellyfin Roku cannot render playlist-aware home content from a server plugin alone; the Roku app has to call this plugin's API. This plugin provides the server API a Roku fork, an upstream Roku PR, or a web-client customization can consume.
 
 ## Related Projects
 
@@ -14,7 +14,9 @@ It does not modify Jellyfin clients by itself. Stock Jellyfin Roku cannot render
 
 This plugin is designed to work with [Naqafin for Roku](https://github.com/naqadata/naqafin-roku), an unofficial Roku client forked from the official Jellyfin Roku client.
 
-Stock Jellyfin Roku cannot display the `Playlist Up Next` row by installing only this server plugin. Until equivalent support is accepted upstream or implemented by another client, Naqafin is the intended Roku client for this plugin.
+Naqafin currently consumes this endpoint by blending playlist candidates into its existing Continue Watching and Next Up home rows, with playlist labels and playlist-aware playback. It no longer adds a dedicated `Playlist Up Next` row.
+
+Stock Jellyfin Roku cannot display this plugin's playlist candidates by installing only this server plugin. Until equivalent support is accepted upstream or implemented by another client, Naqafin is the intended Roku client for this plugin.
 
 This plugin is independent from the generated-caption stack. It can be installed alongside [Jellyfin Plugin Auto Generate Captions](https://github.com/naqadata/jellyfin-plugin-auto-generate-captions), but neither plugin requires the other.
 
@@ -104,10 +106,10 @@ Release artifacts are treated as immutable once pushed. The script refuses to ov
 
 ## Roku
 
-The official Roku app cannot be extended by a Jellyfin server plugin to show a new `Playlist Up Next` home row. To make this appear on Roku, one of these has to happen:
+The official Roku app cannot be extended by a Jellyfin server plugin to show playlist-aware home content. To make this appear on Roku, one of these has to happen:
 
-- Use [Naqafin for Roku](https://github.com/naqadata/naqafin-roku), which includes client support for this endpoint.
-- Patch or fork the upstream Jellyfin Roku app to call `/PlaylistUpNext/{userId}` and add a home row.
+- Use [Naqafin for Roku](https://github.com/naqadata/naqafin-roku), which includes client support for this endpoint and folds results into Continue Watching / Next Up.
+- Patch or fork the upstream Jellyfin Roku app to call `/PlaylistUpNext/{userId}` or `/PlaylistUpNext/{userId}/Entries` and render the returned candidates.
 - Get that support accepted upstream in the official Roku client.
 - Use a web-client-only plugin/theme approach, which helps browser/iOS/Android web-shell clients but not native Roku.
 
